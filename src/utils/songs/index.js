@@ -1,9 +1,9 @@
-const mapDBToModel = ({
+const mapDBToModelSong = ({
     id,
     title,
     year,
-    genre,
     performer,
+    genre,
     duration,
     album_id,
     created_at,
@@ -12,12 +12,12 @@ const mapDBToModel = ({
     id,
     title,
     year,
-    genre,
     performer,
+    genre,
     duration,
     albumId: album_id,
     createdAt: created_at,
     updatedAt: updated_at,
 });
 
-module.exports = { mapDBToModel };
+module.exports = { mapDBToModelSong };

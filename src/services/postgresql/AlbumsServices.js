@@ -1,21 +1,22 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
+const { mapDBToModelAlbum } = require('../../utils/albums');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const { mapDBToModel } = require('../../utils/albums/index');
+
 
 class AlbumsService {
     constructor() {
-        this._pool = new Pool()
+        this._pool = new Pool();
     }
 
     async addAlbum({ name, year }) {
-        const id = nanoid(16)
+        const id = `album-${nanoid(16)}`;
         const createdAt = new Date().toISOString();
         const updatedAt = createdAt;
 
         const query = {
-            text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id',
+            text: 'INSERT INTO albums VALUES ($1, $2, $3, $4, $5) RETURNING id',
             values: [id, name, year, createdAt, updatedAt]
         };
 
@@ -29,20 +30,31 @@ class AlbumsService {
 
     async getAlbums() {
         const result = await this._pool.query('SELECT * FROM albums');
-        return result.rows.map(mapDBToModel);
+        return result.rows.map(mapDBToModelAlbum);
     }
 
     async getAlbumById(id) {
-        const query = {
+        const queryAlbum = {
             text: 'SELECT * FORM albums WHERE id = $1',
             values: [id],
         };
-        const result = await this._pool.query(query);
+        const querySong = {
+            text: 'SELECT songs.id, songs.title, songs.performer FROM songs INNER JOIN albums ON albums.id=songs."albumId" WHERE albums.id=$1',
+            values: [id],
+        }
 
-        if (!result.rows.length) {
+        const resultAlbum = await this.query(queryAlbum);
+        const resultSong = await this._pool.query(querySong);
+
+        if (!resultAlbum.rows.length) {
             throw new NotFoundError('Album tidak ditemukan');
         }
-        return result.rows.map(mapDBToModel)[0];
+        return {
+            id: resultAlbum.rows[0].id,
+            name: resultAlbum.rows[0].name,
+            year: resultAlbum.rows[0].year,
+            songs: resultSong.rows,
+        };
     }
 
     async editAlbumById(id, { name, year }) {
