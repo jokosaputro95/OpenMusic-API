@@ -16,8 +16,8 @@ class AlbumsService {
         const updatedAt = createdAt;
 
         const query = {
-            text: 'INSERT INTO albums VALUES ($1, $2, $3, $4, $5) RETURNING id',
-            values: [id, name, year, createdAt, updatedAt]
+            text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id',
+            values: [id, name, year, createdAt, updatedAt],
         };
 
         const result = await this._pool.query(query);
@@ -35,26 +35,33 @@ class AlbumsService {
 
     async getAlbumById(id) {
         const queryAlbum = {
-            text: 'SELECT * FORM albums WHERE id = $1',
+            text: 'SELECT * FROM albums WHERE id = $1',
             values: [id],
         };
-        const querySong = {
-            text: 'SELECT songs.id, songs.title, songs.performer FROM songs INNER JOIN albums ON albums.id=songs."albumId" WHERE albums.id=$1',
-            values: [id],
-        }
-
-        const resultAlbum = await this.query(queryAlbum);
-        const resultSong = await this._pool.query(querySong);
+        const resultAlbum = await this._pool.query(queryAlbum);
 
         if (!resultAlbum.rows.length) {
             throw new NotFoundError('Album tidak ditemukan');
         }
-        return {
-            id: resultAlbum.rows[0].id,
-            name: resultAlbum.rows[0].name,
-            year: resultAlbum.rows[0].year,
-            songs: resultSong.rows,
-        };
+
+        return resultAlbum.rows.map(mapDBToModelAlbum)[0];
+        // const querySong = {
+        //     text: 'SELECT songs.id, songs.title, songs.performer FROM songs INNER JOIN albums ON albums.id=songs."albumId" WHERE albums.id=$1',
+        //     values: [id],
+        // }
+
+
+        // const resultSong = await this._pool.query(querySong);
+
+
+        // return {
+        //     id: resultAlbum.rows[0].id,
+        //     name: resultAlbum.rows[0].name,
+        //     year: resultAlbum.rows[0].year,
+        //     songs: resultSong.rows,
+
+        // };
+
     }
 
     async editAlbumById(id, { name, year }) {

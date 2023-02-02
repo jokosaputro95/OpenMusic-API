@@ -13,9 +13,9 @@ class AlbumsHandler {
     }
 
     async postAlbumHandler(request, h) {
-        try{
+        try {
             this._validator.validateAlbumPayload(request.payload);
-            
+
             const { name, year } = request.payload;
             const albumId = await this._service.addAlbum({ name, year });
 
@@ -91,11 +91,11 @@ class AlbumsHandler {
     }
 
     async putAlbumByIdHandller(request, h) {
-        try{
+        try {
             this._validator.validateAlbumPayload(request.payload);
             const { id } = request.params;
             const { name, year } = request.payload;
-            
+
             await this._service.editAlbumById(id, { name, year });
 
             return {
@@ -124,7 +124,7 @@ class AlbumsHandler {
     }
 
     async deleteAlbumByIdHandler(request, h) {
-        try{
+        try {
             const { id } = request.params;
 
             await this._service.deleteAlbumById(id);

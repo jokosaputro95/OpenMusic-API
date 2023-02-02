@@ -8,7 +8,7 @@ const mapDBToModelAlbum = ({
     id,
     name,
     year,
-    cratedAt: created_at,
+    created: created_at,
     updatedAt: updated_at,
 });
 
