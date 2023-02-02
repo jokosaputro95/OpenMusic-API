@@ -51,6 +51,8 @@ class SongsService {
         const query = baseQuery + filterQuery;
 
         const result = await this._pool.query(query);
+        // const { rows } = await this._pool.query(query);
+        
         return result.rows.map(mapDBToModelSong);
     }
 
@@ -61,7 +63,7 @@ class SongsService {
         };
         const result = await this._pool.query(query);
 
-        if (!result.rows.length) {
+        if (!result.rowCount) {
             throw new NotFoundError('Lagu tidak ditemukan');
         }
 
