@@ -34,28 +34,12 @@ class SongsService {
         return result.rows[0].id;
     }
 
-    async getSongs({ title, performer }) {
-        if (title === performer) {
-            const query = {
-                text: `SELECT id, title, performer FROM songs ${title ? 'WHERE title = $1 and performer = $2' : ''}`,
-                values: title ? [title, performer] : null,
-            };
-            const result = await this._pool.query(query);
-
-            if (!result.rows.length) {
-                throw new NotFoundError('Lagu tidak ditemukan');
-            }
-            return result.rows;
-        }
-        const query = {
-            text: `SELECT id, title, performer FROM songs WHERE ${title ? 'title = $1' : 'performer = $2'}`,
-            values: [title || performer],
-        };
-        const result = await this._pool.query(query);
-        return result.rows;
+    async getSongs() {
+        const result = await this._pool.query('SELECT id, title, performer FROM songs');
+        return result.rows.map(mapDBToModelSong);
     }
 
-    async getSongsById(id) {
+    async getSongById(id) {
         const query = {
             text: 'SELECT * FROM songs WHERE id = $1',
             values: [id],
@@ -69,15 +53,16 @@ class SongsService {
         return result.rows.map(mapDBToModelSong)[0];
     }
 
-    async editSongById(id, { title, year, performer, genre, duration, albumId }) {
+    async editSongById(id, { title, year, performer, genre, duration }) {
         const updatedAt = new Date().toISOString();
 
         const query = {
-            text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, album_id = $6, update_at = $7 WHERE id = $8 RETURNING id',
-            values: [title, year, performer, genre, duration, albumId, updatedAt, id],
+            text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, updated_at = $6 WHERE id = $7 RETURNING id',
+            values: [title, year, performer, genre, duration, updatedAt, id],
         };
 
         const result = await this._pool.query(query);
+        
         if (!result.rows.length) {
             throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
         }
