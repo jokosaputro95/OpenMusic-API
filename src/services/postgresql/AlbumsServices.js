@@ -44,6 +44,18 @@ class AlbumsService {
             throw new NotFoundError('Album tidak ditemukan');
         }
 
+        const querySongInAlbum = {
+            text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
+            values: [id],
+        }
+        const resultSong = await this._pool.query(querySongInAlbum);
+
+        const result = {
+            ...resultAlbum.rows[0],
+            songs: resultSong.rows
+        }
+        return result;
+
         return resultAlbum.rows.map(mapDBToModelAlbum)[0];
         // const querySong = {
         //     text: 'SELECT songs.id, songs.title, songs.performer FROM songs INNER JOIN albums ON albums.id=songs."albumId" WHERE albums.id=$1',
