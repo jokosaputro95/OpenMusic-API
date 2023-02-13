@@ -46,7 +46,7 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 1
 2. Query Parameter for song search
     - ?title,
     - ?performer
-    * **Note: The use of these two parameters can be combined**
+    * **Note:** The use of these two parameters can be combined
 
 
 # OpenMusic-API-V2
