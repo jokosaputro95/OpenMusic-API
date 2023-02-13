@@ -40,5 +40,14 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 1
 4. Error Handling Implemented
 5. Using a database to store data for albums and songs using Postgresql
 
+### Kriteria Optional
+1. Brings up the track list in album details
+    - endpoint: GET /albums/{albumId}
+2. Query Parameter for song search
+    - ?title,
+    - ?performer
+    * **Note: The use of these two parameters can be combined**
+
+
 # OpenMusic-API-V2
 Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
