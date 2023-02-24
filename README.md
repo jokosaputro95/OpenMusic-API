@@ -58,9 +58,48 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
         - Body Request:
             - username, password, fullname: string
         - Response: 
-            - responeCode: 201
+            - status code: 201
             - data: userId: "user_id"
-        - keterangan: menambahkan pengguna
-    * POST /authentication
-    * PUT /authentication
-    * DELETE /authentication
+        - Keterangan: Menambahkan pengguna
+    * POST /authentications
+        - Body Request:
+            - username, password: string
+        - Response:
+            - status code: 201
+            - data: accessToken: "token", refreshToken: "token"
+        - Keterangan: Autentikasi pengguna/login
+    * PUT /authentications
+        - Body Request:
+            - refreshTOken: string
+        - Response:
+            - status code: 200
+            - data: accessToken: "token"
+        - Keterangan: Memperbaharui access token
+    * DELETE /authentications
+        - Body Request:
+            - refreshToken: string
+        - Response:
+            - status code: 200
+            - message: *any (nilai string apapun selama tidak kosong)
+        - Keterangan: Menghapus autentikasi
+**Ketentuan**: 
+* Username harus unik
+* Authentication menggunakan JWT token
+* JWT token harus mengandung payload berisi **userId** yang merupakan id dari user autentik
+* Nilai secret key token JWT baik access token ataupun refresh token wajib menggunakan environment variabel **ACCESS_TOKEN_KEY** dan **REFRESH_TOKEN_KEY**
+* Refresh token memiliki signature yang benar serta terdaftar di didatabase
+
+2. Pengelolaan Data Playlist
+    * Endpoint
+        - POST /playlists
+            * Body Request:
+                - name: string
+            * Response:
+                - status code: 201
+                - data: playlistId: "playlist_id"
+            * Keterangan: Menambahkan playlist
+        - GET /playlists
+        - DELETE /playlist/{id}
+        - POST /playlists/{id}/songs
+        - GET /playlists/{id}/songs
+        - DELETE /playlists/{id}/songs
