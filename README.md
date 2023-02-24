@@ -1,7 +1,13 @@
-# OpenMusic-API-V1
-Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 1
+# OpenMusic-API
+## Technology
+* NodeJs
+* JWT 
+* Hapi Framework
+* Postgresql
 
-## 5 Kriteria Utama
+## OpenMusic-API-V1
+Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 1
+### 5 Kriteria Utama
 1. Album Data Management
     * POST /albums
     * GET /albums/{id}
@@ -40,7 +46,7 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 1
 4. Error Handling Implemented
 5. Using a database to store data for albums and songs using Postgresql
 
-### Kriteria Optional
+#### Kriteria Optional
 1. Brings up the track list in album details
     - endpoint: GET /albums/{albumId}
 2. Query Parameter for song search
@@ -49,10 +55,9 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 1
     * **Note:** The use of these two parameters can be combined
 
 
-# OpenMusic-API-V2
+## OpenMusic-API-V2
 Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
-
-## 6 Kriteria Utama
+### 6 Kriteria Utama
 1. Registrasi dan Authentikasi Pengguna
     * POST /users 
         - Body Request:
@@ -197,7 +202,7 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
     * Pengelolaan data song
     * Menerapkan data validations resource album dan song
 
-### Kriteria Opsional
+#### Kriteria Opsional
 1. Memiliki fitur kolaborator playlist
     - Endpoint
         - POST /collaborations
@@ -235,9 +240,3 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
 3. Mempertahankan Kriteria Opsional OpenMusic V1
     - Mendapatkan daftar lagu di dalam album detail
     - Query Parameter untuk pencarian lagu
-
-## Technology
-* NodeJs
-* JWT 
-* Hapi Framework
-* Postgresql
