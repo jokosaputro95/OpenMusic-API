@@ -235,3 +235,9 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
 3. Mempertahankan Kriteria Opsional OpenMusic V1
     - Mendapatkan daftar lagu di dalam album detail
     - Query Parameter untuk pencarian lagu
+
+## Technology
+* NodeJs
+* JWT 
+* Hapi Framework
+* Postgresql
