@@ -82,6 +82,7 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
             - status code: 200
             - message: *any (nilai string apapun selama tidak kosong)
         - Keterangan: Menghapus autentikasi
+        
 **Ketentuan**: 
 * Username harus unik
 * Authentication menggunakan JWT token
