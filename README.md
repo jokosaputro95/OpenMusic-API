@@ -51,3 +51,16 @@ Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 1
 
 # OpenMusic-API-V2
 Submission Dicoding Fundamental Back-End Apps OpenMusic API Versi 2
+
+## 6 Kriteria Utama
+1. Registrasi dan Authentikasi Pengguna
+    * POST /users 
+        - Body Request:
+            - username, password, fullname: string
+        - Response: 
+            - responeCode: 201
+            - data: userId: "user_id"
+        - keterangan: menambahkan pengguna
+    * POST /authentication
+    * PUT /authentication
+    * DELETE /authentication
