@@ -1,30 +1,30 @@
 const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
+// const NotFoundError = require('../../exceptions/NotFoundError');
 
-class UsersHandler {
+class PlaylistHandler {
     constructor(service, validator) {
         this._service = service;
-        this._validator = validator;
+        this._validator = validator
 
         autoBind(this);
     }
 
-    async postUserHandler(request, h) {
+    async postPlaylistHandler(request, h) {
         try {
-            this._validator.validateUserPayload(request.payload);
-            const { username, password, fullname } = request.payload;
+            this._validator.validatePlaylistPayload(request.payload);
+            const { name } = request.payload;
+            const { id: credentialId } = request.auth.credentials;
 
-            const userId = await this._service.addUser({
-                username,
-                password,
-                fullname
+            const playlistId = await this._service.addPlaylist({
+                name, owner: credentialId,
             });
 
             const response = h.response({
                 status: 'success',
-                message: 'User berhasil ditambahkan',
+                message: 'Playlist berhasil ditambahkan',
                 data: {
-                    userId,
+                    playlistId,
                 },
             });
             response.code(201);
@@ -50,17 +50,19 @@ class UsersHandler {
         }
     }
 
-    async getUserByIdHandler(request, h) {
+    async getPlaylistHandler(request, h) {
         try {
-            const { id } = request.params;
-            const users = await this._service.getUserById(id);
+            const { id: credentialId } = request.auth.credentials;
+            const playlists = await this._service.getPlaylist(credentialId);
 
-            return {
+            const response = h.response({
                 status: 'success',
                 data: {
-                    users,
+                    playlists,
                 },
-            };
+            });
+            response.code(200);
+            return response;
         } catch (error) {
             if (error instanceof ClientError) {
                 const response = h.response({
@@ -82,17 +84,20 @@ class UsersHandler {
         }
     }
 
-    async getUserByUsernameHandler(request, h) {
+    async deletePlaylistHandler(request, h) {
         try {
-            const { username } = request.query;
-            const users = await this._service.getUserByUsername(username);
+            const { id } = request.params;
+            const { id: credentialId } = request.auth.credentials;
 
-            return {
+            await this._service.verifyPlaylistOwner(id, credentialId);
+            await this._service.deletePlaylistById(id);
+
+            const response = h.response({
                 status: 'success',
-                data: {
-                    users,
-                },
-            };
+                message: 'Playlist berhasil dihapus',
+            });
+            response.code(200);
+            return response;
         } catch (error) {
             if (error instanceof ClientError) {
                 const response = h.response({
@@ -115,4 +120,4 @@ class UsersHandler {
     }
 }
 
-module.exports = UsersHandler;
+module.exports = PlaylistHandler;
