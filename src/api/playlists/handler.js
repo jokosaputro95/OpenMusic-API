@@ -1,4 +1,5 @@
 const autoBind = require('auto-bind');
+const ClientError = require('../../exceptions/ClientError');
 
 class PlaylistsHandler {
     constructor(
@@ -16,26 +17,32 @@ class PlaylistsHandler {
     }
 
     async postPlaylistHandler(request, h) {
-        this._playlistsValidator.validatePlaylistsPayload(request.payload);
+        try {
+            this._playlistsValidator.validatePlaylistsPayload(request.payload);
 
-        const { name } = request.payload;
-        const { credentialId } = request.auth.credentials;
+            const { name } = request.payload;
+            const { id: credentialId } = request.auth.credentials;
 
-        const playlistId = await this._playlistsService.addPlaylist({
-            name,
-            owner: credentialId,
-        });
+            const playlistId = await this._playlistsService.addPlaylist({ name, owner: credentialId });
 
-        const resposne = h.resposne({
-            status: 'success',
-            message: 'Playlist berhasil ditambahkan',
-            data: {
-                playlistId,
-            },
-        });
-
-        resposne.code(201);
-        return resposne;
+            const resposne = h.resposne({
+                status: 'success',
+                data: {
+                    playlistId,
+                },
+            });
+            resposne.code(201);
+            return resposne;
+        } catch (error) {
+            if (error instanceof ClientError) {
+                const response = h.response({
+                    status: 'fail',
+                    message: error.message,
+                });
+                response.code(error.statusCode);
+                return response;
+            }
+        }
     }
 
     async getPlaylistsHandler(request) {
