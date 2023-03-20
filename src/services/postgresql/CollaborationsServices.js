@@ -1,17 +1,29 @@
 const { Pool } = require('pg');
 const { nandoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class CollaborationsService {
     constructor() {
         this._pool = new Pool();
     }
 
-    async addCollaboration(playlistId, userId) {
+    async addCollaborator(playlistId, userId) {
+        const userQuery = {
+            text: 'SELECT * FROM users WHERE id = $1',
+            values: [userId],
+        }
+
+        const userResult = await this._pool.query(userQuery);
+
+        if (!userResult.rowCount) {
+            throw new NotFoundError('User tidak ditemukan')
+        }
+
         const id = `collab-${nandoid(16)}`;
 
         const query = {
-            text: 'INSERT INTO collaborations VALUES ($1, $2, $3) RETURNING id',
+            text: 'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
             values: [id, playlistId, userId],
         };
 
@@ -24,7 +36,7 @@ class CollaborationsService {
         return result.rows[0].id;
     }
 
-    async deleteCollaboration(playlistId, userId) {
+    async deleteCollaborator(playlistId, userId) {
         const query = {
             text: 'DELETE FROM collaborations WHERE playlist_id = $1 AND user_id = $2 RETURNING id',
             values: [playlistId, userId],

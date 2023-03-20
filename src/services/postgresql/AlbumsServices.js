@@ -16,7 +16,7 @@ class AlbumsService {
         const updatedAt = createdAt;
 
         const query = {
-            text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $5) RETURNING id',
+            text: 'INSERT INTO albums VALUES ($1, $2, $3, $4, $5) RETURNING id',
             values: [id, name, year, createdAt, updatedAt],
         };
 

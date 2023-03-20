@@ -21,7 +21,7 @@ class PlaylistsService {
         const result = await this._pool.query(query);
 
         if (!result.rowCount) {
-            throw new InvariantError('Playlist gagal ditambahkan');
+            throw new InvariantError('Playlist gagal ditambahkan.');
         }
 
         return result.rows[0].id;
@@ -29,11 +29,12 @@ class PlaylistsService {
 
     async getPlaylist(owner) {
         const query = {
-            text: `SELECT playlists.id, playlists.name, users.username
-            FROM playlists
-            LEFT JOIN users ON users.id = playlists.owner
-            LEFT JOIN collaborations ON playlists.id = collaborations.playlist_id
-            WHERE playlists.owner = $1 OR collaborations.user_id = $1;`,
+            text: `SELECT A.id, A.name, B.username
+            FROM playlists A
+            LEFT JOIN users B ON B.id = A.owner
+            LEFT JOIN collaborations C ON C.playlist_id = A.id
+            WHERE A.owner = $1 OR C.user_id = $1
+            GROUP BY (playlists.id, users.username)`,
             values: [owner],
         };
 
@@ -42,10 +43,10 @@ class PlaylistsService {
         return result.rows;
     }
 
-    async deletePlaylistById(playlistId) {
+    async deletePlaylistById(id) {
         const query = {
             text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
-            values: [playlistId],
+            values: [id],
         };
 
         const result = await this._pool.query(query);
@@ -57,7 +58,7 @@ class PlaylistsService {
 
     async verifyPlaylistOwner(id, owner) {
         const query = {
-            text: 'SELECT * FROM playlists WHERE id = $1',
+            text: 'SELECT owner FROM playlists WHERE id = $1',
             values: [id],
         };
 
@@ -84,11 +85,9 @@ class PlaylistsService {
         }
 
         try {
-            await this._collaborationsService.verifyCollaboration(playlistId, userId)
+            await this._collaborationsService.verifyCollaborator(playlistId, userId)
         } catch (error) {
-            if (error instanceof NotFoundError) {
-                throw error;
-            }
+            throw error;
         }
     }
 }
