@@ -27,6 +27,7 @@ class PlaylistsHandler {
 
             const resposne = h.resposne({
                 status: 'success',
+                message: 'Playlist berhasil ditambahkan',
                 data: {
                     playlistId,
                 },

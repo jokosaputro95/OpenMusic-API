@@ -10,6 +10,41 @@ class PlaylistsService {
         this._collaborationsService = collaborationsService;
     }
 
+    async verifyPlaylistOwner(id, owner) {
+        const query = {
+            text: 'SELECT owner FROM playlists WHERE id = $1',
+            values: [id],
+        };
+
+        const result = await this._pool.query(query);
+
+        if (!result.rowCount) {
+            throw new NotFoundError('User tidak ditemukan');
+        }
+
+        const playlist = result.rows[0];
+
+        if (playlist.owner !== owner) {
+            throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+        }
+    }
+
+    async verifyPlaylistAccess(playlistId, userId) {
+        try {
+            await this.verifyPlaylistOwner(playlistId, userId)
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                throw error;
+            }
+        }
+
+        try {
+            await this._collaborationsService.verifyCollaborator(playlistId, userId)
+        } catch {
+            throw error;
+        }
+    }
+
     async addPlaylist({ name, owner }) {
         const id = `playlist-${nanoid(16)}`;
 
@@ -53,41 +88,6 @@ class PlaylistsService {
 
         if (!result.rowCount) {
             throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan');
-        }
-    }
-
-    async verifyPlaylistOwner(id, owner) {
-        const query = {
-            text: 'SELECT owner FROM playlists WHERE id = $1',
-            values: [id],
-        };
-
-        const result = await this._pool.query(query);
-
-        if (!result.rowCount) {
-            throw new NotFoundError('Playlist tidak ditemukan');
-        }
-
-        const playlist = result.rows[0];
-
-        if (playlist.owner !== owner) {
-            throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
-        }
-    }
-
-    async verifyPlaylistAccess(playlistId, userId) {
-        try {
-            await this.verifyPlaylistOwner(playlistId, userId)
-        } catch (error) {
-            if (error instanceof NotFoundError) {
-                throw error;
-            }
-        }
-
-        try {
-            await this._collaborationsService.verifyCollaborator(playlistId, userId)
-        } catch (error) {
-            throw error;
         }
     }
 }
