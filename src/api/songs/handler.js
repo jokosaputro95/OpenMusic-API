@@ -131,7 +131,7 @@ class SongsHandler {
 
             // await this._service.editSongById(id, { title, year, performer, genre, duration });
             await this._service.editSongById(id, request.payload);
-            
+
             return {
                 status: 'success',
                 message: 'Lagu berhasil diperbarui',

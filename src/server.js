@@ -44,7 +44,7 @@ const init = async () => {
     const authenticationsService = new AuthenticationsService();
     const collaborationService = new CollabortionsService();
     const playlistsService = new PlaylistsService(songsService, collaborationService);
-    const playlistSongsActivitiesService = new PlaylistsSongsActivitiesService();
+    const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
 
     const server = Hapi.server({
         port: process.env.PORT,
@@ -106,7 +106,7 @@ const init = async () => {
             plugin: authentications,
             options: {
                 authenticationsService,
-                usersService,
+                usersService: usersService,
                 tokenManager: TokenManager,
                 validator: AuthenticationsValidator,
             },
@@ -116,7 +116,7 @@ const init = async () => {
             options: {
                 playlistsService,
                 validator: PlaylistsValidator,
-                playlistSongsActivitiesService,
+                playlistsSongsActivitiesService,
             },
         },
         {
@@ -134,10 +134,9 @@ const init = async () => {
         // mendapatkan konteks response dari request
         const { response } = request;
         console.log(response);
-
         if (response instanceof Error) {
-            console.log(response.message);
             const { statusCode, message } = response.output.payload;
+
             if (statusCode === 401 || statusCode === 413 || statusCode === 415) {
                 return h.response({
                     status: 'fail',
@@ -150,9 +149,7 @@ const init = async () => {
             if (response instanceof ClientError) {
                 const newResponse = h.response({
                     status: 'fail',
-                    message: typeof response.message !== "string"
-                        ? response.message.toString()
-                        : response.message,
+                    message: response.message,
                 });
                 newResponse.code(response.statusCode);
                 return newResponse;
@@ -166,15 +163,16 @@ const init = async () => {
             // penanganan server error sesuai kebutuhan
             const newResponse = h.response({
                 status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
+                message: 'terjadi kegagalan pada server kami',
             });
             newResponse.code(500);
             return newResponse;
         }
-
+        
         // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
         return h.continue;
     });
+
 
     await server.start();
     console.log(`Server berjalan pada ${server.info.uri}`);

@@ -60,16 +60,18 @@ class AuthenticationsHandler {
 
             const { refreshToken } = request.payload;
             await this._authenticationsService.verifyRefreshToken(refreshToken);
+
             const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
 
             const accessToken = this._tokenManager.generateAccessToken({ id });
-            return {
+            return h.response({
                 status: 'success',
                 message: 'Access Token berhasil diperbarui',
                 data: {
                     accessToken,
                 },
-            };
+            })
+                .code(200);
         } catch (error) {
             if (error instanceof ClientError) {
                 const response = h.response({
@@ -99,10 +101,11 @@ class AuthenticationsHandler {
             await this._authenticationsService.verifyRefreshToken(refreshToken);
             await this._authenticationsService.deleteRefreshToken(refreshToken);
 
-            return {
+            return h.response({
                 status: 'success',
                 message: 'Refresh token berhasil dihapus',
-            };
+            })
+                .code(200);
         } catch (error) {
             if (error instanceof ClientError) {
                 const response = h.response({

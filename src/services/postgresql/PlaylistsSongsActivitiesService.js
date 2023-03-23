@@ -3,36 +3,26 @@ const { nanoid } = require('nanoid');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvarianError = require('../../exceptions/InvariantError');
 
-class PlaylistSongsActivitiesService {
+class PlaylistsSongsActivitiesService {
     constructor() {
         this._pool = new Pool();
     }
 
-    async activitiesAddSongPlaylist({ playlistId, songId, userId, action }) {
+    async activitiesAddSongPlaylist({
+        playlistId,
+        songId,
+        userId,
+        action
+    }) {
         const id = `activity-${nanoid(16)}`;
 
         const query = {
-            text: 'INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5) RETURNING id',
+            text: 'INSERT INTO playlist_song_activities VALUES ($1, $2, $3, $4, $5) RETURNING id',
             values: [id, playlistId, songId, userId, action],
         };
         const result = await this._pool.query(query);
 
         if (!result.rows[0].id) {
-            throw new InvarianError('Activity gagal ditambahkan ke playlist');
-        }
-
-        return result.rows[0].id;
-    }
-    async activitiesDeleteSongPlaylist({ playlistId, songId, userId, action, }) {
-        const id = `activity-${nanoid(16)}`;
-
-        const query = {
-            text: 'INSERT INTO playlist_song_activities VALUES ($1, $2, $3, $4, $5)',
-            values: [id, playlistId, songId, userId, action],
-        };
-        const result = await this._pool.query(query);
-
-        if (!result.rowCount) {
             throw new InvarianError('Activity gagal ditambahkan ke playlist');
         }
 
@@ -61,4 +51,4 @@ class PlaylistSongsActivitiesService {
     }
 }
 
-module.exports = PlaylistSongsActivitiesService;
+module.exports = PlaylistsSongsActivitiesService;

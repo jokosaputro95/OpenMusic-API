@@ -11,12 +11,12 @@ class PlaylistsService {
         this._collaborationsService = collaborationsService;
     }
 
-    async addPlaylist({ name, owner }) {
+    async addPlaylist(name, userId) {
         const id = `playlist-${nanoid(16)}`;
 
         const query = {
             text: 'INSERT INTO playlists VALUES ($1, $2, $3) RETURNING id',
-            values: [id, name, owner],
+            values: [id, name, userId],
         };
 
         const result = await this._pool.query(query);
@@ -43,10 +43,10 @@ class PlaylistsService {
         return result.rows;
     }
 
-    async deletePlaylistById(id) {
+    async deletePlaylistById(playlistId) {
         const query = {
-            text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
-            values: [id],
+            text: `DELETE FROM playlists WHERE id = $1 RETURNING id`,
+            values: [playlistId],
         };
 
         const result = await this._pool.query(query);
@@ -107,20 +107,21 @@ class PlaylistsService {
 
     async deleteSongFromPlaylist(playlistId, songId) {
         const query = {
-            text: 'DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+            text: `DELETE FROM playlist_songs
+            WHERE playlist_id = $1 AND song_id = $2 RETURNING id`,
             values: [playlistId, songId],
         };
 
         const result = await this._pool.query(query);
 
         if (!result.rowCount === 0) {
-            throw new NotFoundError('Playlist song gagal dihapus, playlist id dan song id tidak ditemukan');
+            throw new InvariantError('Playlist song gagal dihapus, playlist id dan song id tidak ditemukan');
         }
 
         return result.rows[0].id;
     }
 
-    async verifyPlaylistsOwner(playlistId, userId) {
+    async verifyPlaylistsOwner(playlistId, owner) {
         const query = {
             text: 'SELECT * FROM playlists WHERE id = $1',
             values: [playlistId],
@@ -132,9 +133,9 @@ class PlaylistsService {
             throw new NotFoundError('User tidak ditemukan');
         }
 
-        const ownerId = result.rows[0].owner;
+        const playlist = result.rows[0];
 
-        if (ownerId !== userId) {
+        if (playlist.owner !== owner) {
             throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
         }
     }
