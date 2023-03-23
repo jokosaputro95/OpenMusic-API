@@ -12,6 +12,19 @@ class UserService {
         this._pool = new Pool();
     }
 
+    async verifyNewUsername(username) {
+        const query = {
+            text: 'SELECT username FROM users WHERE username = $1',
+            values: [username],
+        };
+
+        const result = await this._pool.query(query);
+
+        if (result.rowCount !==0) {
+            throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
+        }
+    }
+
     async addUser({ username, password, fullname }) {
         await this.verifyNewUsername(username);
 
@@ -30,21 +43,6 @@ class UserService {
         }
 
         return result.rows[0].id;
-    }
-
-    async verifyNewUsername(username) {
-        const query = {
-            text: 'SELECT username FROM users WHERE username = $1',
-            values: [username],
-        };
-
-        const result = await this._pool.query(query);
-
-        if (result.rowCount) {
-            throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
-        }
-
-        return result.rows[0];
     }
 
     async getUserById(userId) {

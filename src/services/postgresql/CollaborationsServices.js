@@ -1,7 +1,6 @@
 const { Pool } = require('pg');
 const { nandoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
-const NotFoundError = require('../../exceptions/NotFoundError');
 
 class CollaborationsService {
     constructor() {
@@ -9,27 +8,16 @@ class CollaborationsService {
     }
 
     async addCollaborator(playlistId, userId) {
-        const userQuery = {
-            text: 'SELECT * FROM users WHERE id = $1',
-            values: [userId],
-        }
-
-        const userResult = await this._pool.query(userQuery);
-
-        if (!userResult.rowCount) {
-            throw new NotFoundError('User tidak ditemukan')
-        }
-
         const id = `collab-${nandoid(16)}`;
 
         const query = {
-            text: 'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
+            text: 'INSERT INTO collaborations VALUES ($1, $2, $3) RETURNING id',
             values: [id, playlistId, userId],
         };
 
         const result = await this._pool.query(query);
 
-        if (!result.rowCount) {
+        if (!result.rows[0]?.id) {
             throw new InvariantError('Kolaborasi gagal ditambahkan');
         }
 
@@ -44,20 +32,21 @@ class CollaborationsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rowCount) {
+        if (!result.rows[0]?.id) {
             throw new InvariantError('Kolaborasi gagal dihapus');
         }
+        return result.rows[0].id
     }
 
     async verifyCollaborator(playlistId, userId) {
         const query = {
-            text: 'SELECT * FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
+            text: 'SELECT id FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
             values: [playlistId, userId],
         };
 
         const result = await this._pool.query(query);
 
-        if (!result.rowCount) {
+        if (result.rowCount === 0) {
             throw new InvariantError('Kolaborasi gagal diverifikasi');
         }
     }

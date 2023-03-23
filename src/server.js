@@ -7,45 +7,44 @@ const ClientError = require('./exceptions/ClientError');
 // Albums
 const albums = require('./api/albums');
 const AlbumsService = require('./services/postgresql/AlbumsServices');
-const AlbumsValidator = require('./validators/albums');
+const AlbumsValidator = require('./validator/albums');
 
 // Songs
 const songs = require('./api/songs');
 const SongsService = require('./services/postgresql/SongsServices');
-const SongsValidator = require('./validators/songs');
+const SongsValidator = require('./validator/songs');
 
 // Users
 const users = require('./api/users');
 const UsersService = require('./services/postgresql/UsersServices');
-const UsersValidator = require('./validators/users');
+const UsersValidator = require('./validator/users');
 
 // Authentications
 const authentications = require('./api/authentications');
 const AuthenticationsService = require('./services/postgresql/AuthenticationsService');
 const TokenManager = require('./tokenize/tokenManager');
-const AuthenticationsValidator = require('./validators/authentications');
+const AuthenticationsValidator = require('./validator/authentications');
 
 // Playlists
 const playlists = require('./api/playlists');
 const PlaylistsService = require('./services/postgresql/PlaylistsServices');
-const playlistsValidator = require('./validators/playlists');
-const PlaylistsSongsService = require('./services/postgresql/PlaylistsSongsService');
+const PlaylistsValidator = require('./validator/playlists');
 const PlaylistsSongsActivitiesService = require('./services/postgresql/PlaylistsSongsActivitiesService');
 
 // Collaborations
 const collaborations = require('./api/collaborations');
-const CollaborationsService = require('./services/postgresql/CollaborationsServices');
-const CollaborationsValidator = require('./validators/collaborations');
+const CollabortionsService = require('./services/postgresql/CollaborationsServices');
+const CollaborationsValidator = require('./validator/collaborations');
+
 
 const init = async () => {
     const albumsService = new AlbumsService();
     const songsService = new SongsService();
-    const authenticationsService = new AuthenticationsService();
     const usersService = new UsersService();
-    const collaborationsService = new CollaborationsService();
-    const playlistsService = new PlaylistsService(collaborationsService);
-    const playlistsSongsService = new PlaylistsSongsService();
-    const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
+    const authenticationsService = new AuthenticationsService();
+    const collaborationService = new CollabortionsService();
+    const playlistsService = new PlaylistsService(songsService, collaborationService);
+    const playlistSongsActivitiesService = new PlaylistsSongsActivitiesService();
 
     const server = Hapi.server({
         port: process.env.PORT,
@@ -97,6 +96,13 @@ const init = async () => {
             },
         },
         {
+            plugin: users,
+            options: {
+                service: usersService,
+                validator: UsersValidator,
+            },
+        },
+        {
             plugin: authentications,
             options: {
                 authenticationsService,
@@ -106,27 +112,20 @@ const init = async () => {
             },
         },
         {
-            plugin: users,
-            options: {
-                service: usersService,
-                validator: UsersValidator,
-            },
-        },
-        {
             plugin: playlists,
             options: {
-                PlaylistsService: playlistsService,
-                PlaylistsSongsService: playlistsSongsService,
-                PlaylistsSongsActivitiesService: playlistsSongsActivitiesService,
-                PlaylistsValidator: playlistsValidator,
+                playlistsService,
+                validator: PlaylistsValidator,
+                playlistSongsActivitiesService,
             },
         },
         {
             plugin: collaborations,
             options: {
-                CollaborationsService: collaborationsService,
-                PlaylistsService: playlistsService,
-                CollaborationsValidator: CollaborationsValidator,
+                collaborationsService: collaborationService,
+                playlistsService,
+                usersService,
+                validator: CollaborationsValidator,
             },
         },
     ]);
@@ -135,15 +134,25 @@ const init = async () => {
         // mendapatkan konteks response dari request
         const { response } = request;
         console.log(response);
-        
+
         if (response instanceof Error) {
             console.log(response.message);
+            const { statusCode, message } = response.output.payload;
+            if (statusCode === 401 || statusCode === 413 || statusCode === 415) {
+                return h.response({
+                    status: 'fail',
+                    message,
+                })
+                    .code(statusCode);
+            }
 
             // penanganan client error secara internal.
             if (response instanceof ClientError) {
                 const newResponse = h.response({
                     status: 'fail',
-                    message: respons.message,
+                    message: typeof response.message !== "string"
+                        ? response.message.toString()
+                        : response.message,
                 });
                 newResponse.code(response.statusCode);
                 return newResponse;
