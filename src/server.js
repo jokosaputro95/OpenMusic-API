@@ -44,7 +44,7 @@ const init = async () => {
     const authenticationsService = new AuthenticationsService();
     const usersService = new UsersService();
     const collaborationsService = new CollabortionsService();
-    const playlistsService = new PlaylistsService();
+    const playlistsService = new PlaylistsService(collaborationsService);
     const playlistsSongsService = new PlaylistsSongsService();
     const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
 
@@ -138,15 +138,6 @@ const init = async () => {
         const { response } = request;
         console.log(response);
         if (response instanceof Error) {
-            // const { statusCode, message } = response.output.payload;
-
-            // if (statusCode === 401 || statusCode === 413 || statusCode === 415) {
-            //     return h.response({
-            //         status: 'fail',
-            //         message,
-            //     })
-            //         .code(statusCode);
-            // }
 
             // penanganan client error secara internal.
             if (response instanceof ClientError) {
