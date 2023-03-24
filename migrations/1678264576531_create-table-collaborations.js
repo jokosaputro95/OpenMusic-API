@@ -23,7 +23,7 @@ exports.up = (pgm) => {
             type: 'TIMESTAMP',
             notNull: true,
             default: pgm.func('CURRENT_TIMESTAMP'),
-        }
+        },
     });
 
     pgm.addConstraint(
