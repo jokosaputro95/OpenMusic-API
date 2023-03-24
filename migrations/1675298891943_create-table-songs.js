@@ -29,16 +29,25 @@ exports.up = (pgm) => {
             type: 'VARCHAR(50)',
         },
         created_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
         },
         updated_at: {
-            type: 'TEXT',
+            type: 'TIMESTAMP',
             notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
         },
     });
+
+    pgm.addConstraint(
+        'songs',
+        'fk_songs.album_id',
+        'FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE'
+    );
 };
 
 exports.down = (pgm) => {
+    pgm.dropConstraint('songs', 'fk_songs.album_id');
     pgm.dropTable('songs');
 };

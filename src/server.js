@@ -20,31 +20,31 @@ const UsersService = require('./services/postgresql/UsersServices');
 const UsersValidator = require('./validator/users');
 
 // Authentications
-const authentications = require('./api/authentications');
-const AuthenticationsService = require('./services/postgresql/AuthenticationsService');
-const TokenManager = require('./tokenize/tokenManager');
-const AuthenticationsValidator = require('./validator/authentications');
+// const authentications = require('./api/authentications');
+// const AuthenticationsService = require('./services/postgresql/AuthenticationsService');
+// const TokenManager = require('./tokenize/tokenManager');
+// const AuthenticationsValidator = require('./validator/authentications');
 
 // Playlists
-const playlists = require('./api/playlists');
-const PlaylistsService = require('./services/postgresql/PlaylistsServices');
-const PlaylistsValidator = require('./validator/playlists');
-const PlaylistsSongsActivitiesService = require('./services/postgresql/PlaylistsSongsActivitiesService');
+// const playlists = require('./api/playlists');
+// const PlaylistsService = require('./services/postgresql/PlaylistsServices');
+// const PlaylistsValidator = require('./validator/playlists');
+// const PlaylistsSongsActivitiesService = require('./services/postgresql/PlaylistsSongsActivitiesService');
 
 // Collaborations
-const collaborations = require('./api/collaborations');
-const CollabortionsService = require('./services/postgresql/CollaborationsServices');
-const CollaborationsValidator = require('./validator/collaborations');
+// const collaborations = require('./api/collaborations');
+// const CollabortionsService = require('./services/postgresql/CollaborationsServices');
+// const CollaborationsValidator = require('./validator/collaborations');
 
 
 const init = async () => {
     const albumsService = new AlbumsService();
     const songsService = new SongsService();
     const usersService = new UsersService();
-    const authenticationsService = new AuthenticationsService();
-    const collaborationService = new CollabortionsService();
-    const playlistsService = new PlaylistsService(songsService, collaborationService);
-    const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
+    // const authenticationsService = new AuthenticationsService();
+    // const collaborationService = new CollabortionsService();
+    // const playlistsService = new PlaylistsService(songsService, collaborationService);
+    // const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
 
     const server = Hapi.server({
         port: process.env.PORT,
@@ -135,15 +135,15 @@ const init = async () => {
         const { response } = request;
         console.log(response);
         if (response instanceof Error) {
-            const { statusCode, message } = response.output.payload;
+            // const { statusCode, message } = response.output.payload;
 
-            if (statusCode === 401 || statusCode === 413 || statusCode === 415) {
-                return h.response({
-                    status: 'fail',
-                    message,
-                })
-                    .code(statusCode);
-            }
+            // if (statusCode === 401 || statusCode === 413 || statusCode === 415) {
+            //     return h.response({
+            //         status: 'fail',
+            //         message,
+            //     })
+            //         .code(statusCode);
+            // }
 
             // penanganan client error secara internal.
             if (response instanceof ClientError) {

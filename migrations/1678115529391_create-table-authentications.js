@@ -6,6 +6,11 @@ exports.up = (pgm) => {
             type: 'TEXT',
             notNull: true,
         },
+        created_at: {
+            type: 'TIMESTAMP',
+            notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
+        },
     });
 };
 
