@@ -2,9 +2,9 @@ const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class UsersHandler {
-    constructor(usersService, usersValidator) {
-        this._usersService = usersService;
-        this._usersValidator = usersValidator;
+    constructor(UsersService, UsersValidator) {
+        this._usersService = UsersService;
+        this._usersValidator = UsersValidator;
 
         autoBind(this);
     }
