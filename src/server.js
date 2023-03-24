@@ -7,41 +7,41 @@ const ClientError = require('./exceptions/ClientError');
 // Albums
 const albums = require('./api/albums');
 const AlbumsService = require('./services/postgresql/AlbumsServices');
-const AlbumsValidator = require('./validator/albums');
+const albumsValidator = require('./validator/albums');
 
 // Songs
 const songs = require('./api/songs');
 const SongsService = require('./services/postgresql/SongsServices');
-const SongsValidator = require('./validator/songs');
+const songsValidator = require('./validator/songs');
+
+// Authentications
+const authentications = require('./api/authentications');
+const AuthenticationsService = require('./services/postgresql/AuthenticationsService');
+const authenticationsValidator = require('./validator/authentications');
+const tokenManager = require('./tokenize/tokenManager');
 
 // Users
 const users = require('./api/users');
 const UsersService = require('./services/postgresql/UsersServices');
-const UsersValidator = require('./validator/users');
-
-// Authentications
-// const authentications = require('./api/authentications');
-// const AuthenticationsService = require('./services/postgresql/AuthenticationsService');
-// const TokenManager = require('./tokenize/tokenManager');
-// const AuthenticationsValidator = require('./validator/authentications');
+const usersValidator = require('./validator/users');
 
 // Playlists
 // const playlists = require('./api/playlists');
 // const PlaylistsService = require('./services/postgresql/PlaylistsServices');
-// const PlaylistsValidator = require('./validator/playlists');
+// const playlistsValidator = require('./validator/playlists');
 // const PlaylistsSongsActivitiesService = require('./services/postgresql/PlaylistsSongsActivitiesService');
 
 // Collaborations
 // const collaborations = require('./api/collaborations');
 // const CollabortionsService = require('./services/postgresql/CollaborationsServices');
-// const CollaborationsValidator = require('./validator/collaborations');
+// const collaborationsValidator = require('./validator/collaborations');
 
 
 const init = async () => {
     const albumsService = new AlbumsService();
     const songsService = new SongsService();
+    const authenticationsService = new AuthenticationsService();
     const usersService = new UsersService();
-    // const authenticationsService = new AuthenticationsService();
     // const collaborationService = new CollabortionsService();
     // const playlistsService = new PlaylistsService(songsService, collaborationService);
     // const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
@@ -84,50 +84,51 @@ const init = async () => {
         {
             plugin: albums,
             options: {
-                service: albumsService,
-                validator: AlbumsValidator,
+                AlbumsService: albumsService,
+                SongsService: songsService,
+                AlbumsValidator: albumsValidator,
             },
         },
         {
             plugin: songs,
             options: {
-                service: songsService,
-                validator: SongsValidator,
-            },
-        },
-        {
-            plugin: users,
-            options: {
-                service: usersService,
-                validator: UsersValidator,
+                SongsService: songsService,
+                SongsValidator: songsValidator,
             },
         },
         {
             plugin: authentications,
             options: {
-                authenticationsService,
-                usersService: usersService,
-                tokenManager: TokenManager,
-                validator: AuthenticationsValidator,
+                AuthenticationsService: authenticationsService,
+                UsersService: usersService,
+                TokenManager: tokenManager,
+                AuthenticationsValidator: authenticationsValidator,
             },
         },
         {
-            plugin: playlists,
+            plugin: users,
             options: {
-                playlistsService,
-                validator: PlaylistsValidator,
-                playlistsSongsActivitiesService,
+                UsersService: usersService,
+                UsersValidator: usersValidator,
             },
         },
-        {
-            plugin: collaborations,
-            options: {
-                collaborationsService: collaborationService,
-                playlistsService,
-                usersService,
-                validator: CollaborationsValidator,
-            },
-        },
+        // {
+        //     plugin: playlists,
+        //     options: {
+        //         playlistsService,
+        //         validator: PlaylistsValidator,
+        //         playlistsSongsActivitiesService,
+        //     },
+        // },
+        // {
+        //     plugin: collaborations,
+        //     options: {
+        //         collaborationsService: collaborationService,
+        //         playlistsService,
+        //         usersService,
+        //         validator: CollaborationsValidator,
+        //     },
+        // },
     ]);
 
     server.ext('onPreResponse', (request, h) => {

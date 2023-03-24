@@ -1,7 +1,5 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
-// const { mapDBToModelUser } = require('../../utils/users');
-
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
@@ -20,7 +18,7 @@ class UserService {
 
         const result = await this._pool.query(query);
 
-        if (result.rowCount !==0) {
+        if (result.rowCount !== 0) {
             throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
         }
     }
@@ -30,7 +28,7 @@ class UserService {
 
         const id = `user-${nanoid(16)}`;
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         const query = {
             text: 'INSERT INTO users VALUES ($1, $2, $3, $4) RETURNING id',
             values: [id, username, hashedPassword, fullname],
@@ -60,6 +58,17 @@ class UserService {
         return result.rows[0];
     }
 
+    async getUserByUsername(username) {
+        const query = {
+            text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
+            values: [`%${username}%`],
+        };
+
+        const result = await this._pool.query(query);
+
+        return result.rows;
+    }
+
     async verifyUserCredential(username, password) {
         const query = {
             text: 'SELECT id, password FROM users WHERE username = $1',
@@ -81,17 +90,6 @@ class UserService {
         }
 
         return id;
-    }
-
-    async getUserByUsername(username) {
-        const query = {
-            text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
-            values: [`%${username}%`],
-        };
-
-        const result = await this._pool.query(query);
-
-        return result.rows;
     }
 }
 

@@ -1,4 +1,4 @@
-const mapDBToModelAlbum = ({
+const mapDBToModelAlbums = ({
     id,
     name,
     year,
@@ -12,4 +12,4 @@ const mapDBToModelAlbum = ({
     updatedAt: updated_at,
 });
 
-module.exports = { mapDBToModelAlbum };
+module.exports = { mapDBToModelAlbums };

@@ -2,116 +2,59 @@ const autoBind = require('auto-bind');
 const ClientError = require('../../exceptions/ClientError');
 
 class UsersHandler {
-    constructor(service, validator) {
-        this._service = service;
-        this._validator = validator;
+    constructor(usersService, usersValidator) {
+        this._usersService = usersService;
+        this._usersValidator = usersValidator;
 
         autoBind(this);
     }
 
     async postUserHandler(request, h) {
-        try {
-            this._validator.validateUserPayload(request.payload);
-            const { username, password, fullname } = request.payload;
+        this._usersValidator.validateUserPayload(request.payload);
 
-            const userId = await this._service.addUser({
-                username,
-                password,
-                fullname
-            });
+        const { username, password, fullname } = request.payload;
 
-            const response = h.response({
-                status: 'success',
-                message: 'User berhasil ditambahkan',
-                data: {
-                    userId,
-                },
-            });
-            response.code(201);
-            return response;
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-            }
+        const userId = await this._usersService.addUser({
+            username,
+            password,
+            fullname
+        });
 
-            // Server Error!
-            const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-            });
-            response.code(500);
-            console.error(error);
-            return response;
-        }
+        const response = h.response({
+            status: 'success',
+            message: 'User berhasil ditambahkan',
+            data: {
+                userId,
+            },
+        });
+        response.code(201);
+        return response;
     }
 
     async getUserByIdHandler(request, h) {
-        try {
-            const { id } = request.params;
-            const users = await this._service.getUserById(id);
+        const { id } = request.params;
 
-            return {
-                status: 'success',
-                data: {
-                    users,
-                },
-            };
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-            }
+        const users = await this._usersService.getUserById(id);
 
-            // Server Error!
-            const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-            });
-            response.code(500);
-            console.error(error);
-            return response;
-        }
+        return h.response({
+            status: 'success',
+            data: {
+                users,
+            },
+        });
     }
 
     async getUserByUsernameHandler(request, h) {
-        try {
-            const { username } = request.query;
-            const users = await this._service.getUserByUsername(username);
+        const { username = '' } = request.query;
 
-            return {
-                status: 'success',
-                data: {
-                    users,
-                },
-            };
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-            }
+        const users = await this._usersService.getUserByUsername(username);
 
-            // Server Error!
-            const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-            });
-            response.code(500);
-            console.error(error);
-            return response;
-        }
+        return h.response({
+            status: 'success',
+            data: {
+                users,
+            },
+        });
     }
 }
 

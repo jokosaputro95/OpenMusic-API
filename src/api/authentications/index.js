@@ -8,13 +8,13 @@ module.exports = {
         authenticationsService,
         usersService,
         tokenManager,
-        validator,
+        authenticationsValidator
     }) => {
         const authenticationsHandler = new AuthenticationsHandler(
             authenticationsService,
             usersService,
             tokenManager,
-            validator,
+            authenticationsValidator
         );
         
         server.route(routes(authenticationsHandler));

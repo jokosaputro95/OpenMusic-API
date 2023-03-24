@@ -1,9 +1,8 @@
-const ClientError = require('../../exceptions/ClientError');
-
 class AlbumsHandler {
-    constructor(service, validator) {
-        this._service = service;
-        this._validator = validator;
+    constructor(albumsService, songsService, albumsValidator) {
+        this._albumsService = albumsService;
+        this._songsService = songsService;
+        this._albumsValidator = albumsValidator;
 
         this.postAlbumHandler = this.postAlbumHandler.bind(this);
         this.getAlbumsHandler = this.getAlbumsHandler.bind(this);
@@ -13,44 +12,25 @@ class AlbumsHandler {
     }
 
     async postAlbumHandler(request, h) {
-        try {
-            this._validator.validateAlbumPayload(request.payload);
+        this._albumsValidator.validateAlbumPayload(request.payload);
 
-            const { name, year } = request.payload;
-            const albumId = await this._service.addAlbum({ name, year });
+        const albumId = await this._albumsService.addAlbum(request.payload);
 
-            const response = h.response({
-                status: 'success',
-                message: 'Album berhasil ditambahkan',
-                data: {
-                    albumId,
-                },
-            });
-            response.code(201);
-            return response
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: error.message
-                });
-                response.code(error.statusCode);
-                return response;
-            }
+        const response = h.response({
+            status: 'success',
+            message: 'Album berhasil ditambahkan',
+            data: {
+                albumId,
+            },
+        });
+        response.code(201);
+        return response
 
-            // Server Error!
-            const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-            });
-            response.code(500);
-            console.log(error);
-            return response;
-        }
     }
 
     async getAlbumsHandler() {
-        const albums = await this._service.getAlbums();
+        const albums = await this._albumsService.getAlbums();
+
         return {
             status: 'success',
             data: {
@@ -60,100 +40,42 @@ class AlbumsHandler {
     }
 
     async getAlbumByIdHandler(request, h) {
-        try {
-            const { id } = request.params;
-            const album = await this._service.getAlbumById(id);
-            return {
-                status: 'success',
-                data: {
-                    album,
-                },
-            };
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-            }
+        const { id } = request.params;
 
-            // Server Error !
-            const response = h.response({
-                status: 'fail',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-            });
-            response.code(500);
-            console.log(error);
-            return response;
-        }
+        const album = await this._albumsService.getAlbumById(id);
+        album.songs = await this._songsService.getSongByAlbumId(id);
+
+        return h.response({
+            status: 'success',
+            data: {
+                album,
+            },
+        });
     }
 
     async putAlbumByIdHandller(request, h) {
-        try {
-            this._validator.validateAlbumPayload(request.payload);
-            const { id } = request.params;
-            const { name, year } = request.payload;
+        this._albumsValidator.validateAlbumPayload(request.payload);
 
-            await this._service.editAlbumById(id, { name, year });
+        const { id } = request.params;
+        await this._albumsService.editAlbumById(id, request.payload);
 
-            return {
-                status: 'success',
-                message: 'Album berhasil diperbarui',
-            };
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-            }
-
-            // Server Erorr !
-            const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-            });
-            response.code(500);
-            console.log(error);
-            return response;
-        }
+        return h.response({
+            status: 'success',
+            message: 'Album berhasil diperbarui',
+        });
     }
 
     async deleteAlbumByIdHandler(request, h) {
-        try {
-            const { id } = request.params;
+        const { id } = request.params;
 
-            await this._service.deleteAlbumById(id);
+        await this._albumsService.deleteAlbumById(id);
 
-            const response = h.response({
-                status: 'success',
-                message: 'Album berhasil dihapus',
-            });
-            response.code(200);
-            return response;
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                    status: 'fail',
-                    message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-            }
+        const response = h.response({
+            status: 'success',
+            message: 'Album berhasil dihapus',
+        });
 
-            // Server Erorr !
-            const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-            });
-            response.code(500);
-            console.log(error);
-            return response;
-        }
+        return response;
     }
 }
 
