@@ -26,15 +26,16 @@ const UsersService = require('./services/postgresql/UsersServices');
 const usersValidator = require('./validator/users');
 
 // Playlists
-// const playlists = require('./api/playlists');
-// const PlaylistsService = require('./services/postgresql/PlaylistsServices');
-// const playlistsValidator = require('./validator/playlists');
-// const PlaylistsSongsActivitiesService = require('./services/postgresql/PlaylistsSongsActivitiesService');
+const playlists = require('./api/playlists');
+const playlistsValidator = require('./validator/playlists');
+const PlaylistsService = require('./services/postgresql/PlaylistsServices');
+const PlaylistsSongsService = require('./services/postgresql/PlaylistsSongsService');
+const PlaylistsSongsActivitiesService = require('./services/postgresql/PlaylistsSongsActivitiesService');
 
 // Collaborations
-// const collaborations = require('./api/collaborations');
-// const CollabortionsService = require('./services/postgresql/CollaborationsServices');
-// const collaborationsValidator = require('./validator/collaborations');
+const collaborations = require('./api/collaborations');
+const CollabortionsService = require('./services/postgresql/CollaborationsServices');
+const CollaborationsValidator = require('./validator/collaborations');
 
 
 const init = async () => {
@@ -42,9 +43,10 @@ const init = async () => {
     const songsService = new SongsService();
     const authenticationsService = new AuthenticationsService();
     const usersService = new UsersService();
-    // const collaborationService = new CollabortionsService();
-    // const playlistsService = new PlaylistsService(songsService, collaborationService);
-    // const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
+    const collaborationsService = new CollabortionsService();
+    const playlistsService = new PlaylistsService();
+    const playlistsSongsService = new PlaylistsSongsService();
+    const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
 
     const server = Hapi.server({
         port: process.env.PORT,
@@ -112,23 +114,23 @@ const init = async () => {
                 UsersValidator: usersValidator,
             },
         },
-        // {
-        //     plugin: playlists,
-        //     options: {
-        //         playlistsService,
-        //         validator: PlaylistsValidator,
-        //         playlistsSongsActivitiesService,
-        //     },
-        // },
-        // {
-        //     plugin: collaborations,
-        //     options: {
-        //         collaborationsService: collaborationService,
-        //         playlistsService,
-        //         usersService,
-        //         validator: CollaborationsValidator,
-        //     },
-        // },
+        {
+            plugin: playlists,
+            options: {
+                PlaylistsService: playlistsService,
+                PlaylistsSongsService: playlistsSongsService,
+                PlaylistsSongsActivitiesService: playlistsSongsActivitiesService,
+                PlaylistsValidator: playlistsValidator,
+            },
+        },
+        {
+            plugin: collaborations,
+            options: {
+                CollabortionsService: collaborationsService,
+                PlaylistsService: playlistsService,
+                CollaborationsValidator: CollaborationsValidator,
+            },
+        },
     ]);
 
     server.ext('onPreResponse', (request, h) => {
@@ -169,7 +171,7 @@ const init = async () => {
             newResponse.code(500);
             return newResponse;
         }
-        
+
         // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
         return h.continue;
     });
