@@ -12,7 +12,7 @@ class PlaylistsHandler {
         this._playlistsSongsService = PlaylistsSongsService;
         this._playlistsSongsActivitiesService = PlaylistsSongsActivitiesService;
         this._playlistsValidator = PlaylistsValidator;
-        
+
         autoBind(this);
     }
 
@@ -22,7 +22,7 @@ class PlaylistsHandler {
         const { name } = request.payload;
         const { id: credentialId } = request.auth.credentials;
 
-        const playlistId = await this._playlistsService.addPlaylist({name, owner: credentialId});
+        const playlistId = await this._playlistsService.addPlaylist({ name, owner: credentialId });
 
         const response = h.response({
             status: 'success',
@@ -35,19 +35,17 @@ class PlaylistsHandler {
         return response;
     }
 
-    async getPlaylistsHandler(request, h) {
+    async getPlaylistsHandler(request) {
         const { id: credentialId } = request.auth.credentials;
 
         const playlists = await this._playlistsService.getPlaylists(credentialId);
 
-        const response = h.response({
+        return {
             status: 'success',
             data: {
                 playlists,
             },
-        });
-        response.code(200);
-        return response;
+        };
     }
 
     async deletePlaylistByIdHandler(request, h) {
@@ -55,13 +53,13 @@ class PlaylistsHandler {
         const { id: credentialId } = request.auth.credentials;
 
         await this._playlistsService.verifyPlaylistsOwner(id, credentialId);
-        await this._playlistsService.deletePlaylistById(id);
+        await this._playlistsService.deletePlaylistsById(id);
 
         const response = h.response({
             status: 'success',
             message: 'Playlist berhasil dihapus',
         });
-        response.code(200);
+
         return response;
     }
 
@@ -85,7 +83,7 @@ class PlaylistsHandler {
         return response;
     }
 
-    async getSongsFromPlaylistByIdHandler(request, h) {
+    async getSongsFromPlaylistByIdHandler(request) {
         const { id: credentialId } = request.auth.credentials;
         const { id: playlistId } = request.params;
 
@@ -93,17 +91,15 @@ class PlaylistsHandler {
 
         const playlist = await this._playlistsSongsService.getSongsFromPlaylist(playlistId);
 
-        const response = h.response({
+        return {
             status: 'success',
             data: {
                 playlist,
             },
-        });
-        response.code(200);
-        return response;
+        };
     }
 
-    async deleteSongsFromPlaylistByIdHandler(request, h) {
+    async deleteSongsFromPlaylistByIdHandler(request) {
         const { id: credentialId } = request.auth.credentials;
         const { id: playlistId } = request.params;
         const { songId } = request.payload;
@@ -111,32 +107,26 @@ class PlaylistsHandler {
         await this._playlistsService.verifyPlaylistsAccess(playlistId, credentialId);
         await this._playlistsSongsService.deleteSongFromPlaylist(playlistId, songId);
 
-        const action = 'delete';
-        await this._playlistsSongsActivitiesService.activitiesAddSongPlaylist({
-            playlistId, songId, userId: credentialId, action,
-        });
+        await this._playlistsSongsActivitiesService.activitiesDeleteSongPlaylist(playlistId, songId, credentialId);
 
-        const response = h.response({
+        return {
             status: 'success',
             message: 'Lagu berhasil dihapus dari playlist',
-        });
-        response.code(200);
-        return response;
+        };
     }
 
-    async getPlaylistActivitiesByIdHandler(request, h) {
+    async getPlaylistActivitiesByIdHandler(request) {
         const { id: credentialId } = request.auth.credentials;
         const { id: playlistId } = request.params;
 
-        await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+        await this._playlistsService.verifyPlaylistsAccess(playlistId, credentialId);
 
         const activities = await this._playlistsSongsActivitiesService.getActivitiesSongPlaylist(playlistId);
 
-        const response = h.response({
+        return {
             status: 'success',
             data: activities,
-        });
-        return response;
+        };
     }
 }
 

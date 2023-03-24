@@ -30,7 +30,7 @@ class CollaborationsHandler {
         return response;
     }
 
-    async deleteCollaborationHandler(request, h) {
+    async deleteCollaborationHandler(request) {
         this._collaborationsValidator.validateCollaborationsPayload(request.payload);
 
         const { id: credentialId } = request.auth.credentials;
@@ -39,12 +39,10 @@ class CollaborationsHandler {
         await this._playlistsService.verifyPlaylistsOwner(playlistId, credentialId);
         await this._collaborationsService.deleteCollaborator(playlistId, userId);
 
-        const response = h.response({
+        return {
             status: 'success',
             message: 'Kolaborasi berhasil dihapus',
-        });
-        response.code(200);
-        return response;
+        };
     }
 }
 

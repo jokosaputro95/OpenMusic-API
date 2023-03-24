@@ -31,32 +31,32 @@ class PlaylistsSongsService {
     }
 
     async getSongsFromPlaylist(playlistId) {
-        const playlstQuery = {
-            text: `SELECT A.id, A.name, B.username 
-            FROM playlist_songs C
-            INNER JOIN playlists A ON C.playlist_id = A.id 
-            INNER JOIN users B ON A.owner = B.id 
-            WHERE playlist_id = $1`,
+        const playlistQuery = {
+            text: `SELECT playlists.id, playlists.name, users.username 
+                 FROM playlist_songs 
+                 INNER JOIN playlists ON playlist_songs.playlist_id = playlists.id 
+                 INNER JOIN users ON playlists.owner = users.id 
+                 WHERE playlist_id = $1`,
             values: [playlistId],
         };
 
         const userQuery = {
-            text: `SELECT username FROM playlists A
-            INNER JOIN users B ON A.owner = B.id
-            WHERE A.id = $1`,
-            values: [playlistId]
-        };
-
-        const querySong = {
-            text: `SELECT C.id, C.title, C.performer FROM playlist_songs A
-            INNER JOIN songs C ON A.song_id = C.id
-            WHERE A.id = $1`,
+            text: `SELECT username FROM playlists 
+                 INNER JOIN users ON playlists.owner = users.id 
+                 WHERE playlists.id = $1`,
             values: [playlistId],
         };
 
-        const playlistResult = await this._pool.query(playlstQuery);
+        const songQuery = {
+            text: `SELECT songs.id, songs.title, songs.performer FROM playlist_songs 
+                 INNER JOIN songs ON playlist_songs.song_id = songs.id 
+                 WHERE playlist_id = $1`,
+            values: [playlistId],
+        };
+
+        const playlistResult = await this._pool.query(playlistQuery);
         const userResult = await this._pool.query(userQuery);
-        const songResult = await this._pool.query(querySong);
+        const songResult = await this._pool.query(songQuery);
 
         if (!playlistResult.rowCount) {
             throw new NotFoundError('Playlist tidak ditemukan!');
@@ -87,11 +87,9 @@ class PlaylistsSongsService {
 
         const result = await this._pool.query(query);
 
-        if (!result.rowCount === 0) {
+        if (!result.rowCount) {
             throw new InvariantError('Playlist song gagal dihapus, playlist id dan song id tidak ditemukan');
         }
-
-        return result.rows[0].id;
     }
 }
 
