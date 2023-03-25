@@ -6,36 +6,36 @@ const ClientError = require('./exceptions/ClientError');
 
 // Albums
 const albums = require('./api/albums');
-const AlbumsService = require('./services/postgresql/AlbumsServices');
 const albumsValidator = require('./validator/albums');
+const AlbumsService = require('./services/postgresql/AlbumsService');
 
 // Songs
 const songs = require('./api/songs');
-const SongsService = require('./services/postgresql/SongsServices');
 const songsValidator = require('./validator/songs');
+const SongsService = require('./services/postgresql/SongsService');
 
 // Authentications
 const authentications = require('./api/authentications');
-const AuthenticationsService = require('./services/postgresql/AuthenticationsService');
 const authenticationsValidator = require('./validator/authentications');
-const tokenManager = require('./tokenize/tokenManager');
+const AuthenticationsService = require('./services/postgresql/AuthenticationsService');
+const tokenManager = require('./tokenize/TokenManager');
 
 // Users
 const users = require('./api/users');
-const UsersService = require('./services/postgresql/UsersServices');
 const usersValidator = require('./validator/users');
+const UsersService = require('./services/postgresql/UsersService');
 
 // Playlists
 const playlists = require('./api/playlists');
 const playlistsValidator = require('./validator/playlists');
-const PlaylistsService = require('./services/postgresql/PlaylistsServices');
+const PlaylistsService = require('./services/postgresql/PlaylistsService');
 const PlaylistsSongsService = require('./services/postgresql/PlaylistsSongsService');
 const PlaylistsSongsActivitiesService = require('./services/postgresql/PlaylistsSongsActivitiesService');
 
 // Collaborations
 const collaborations = require('./api/collaborations');
-const CollabortionsService = require('./services/postgresql/CollaborationsServices');
 const CollaborationsValidator = require('./validator/collaborations');
+const CollaborationsService = require('./services/postgresql/CollaborationsService');
 
 
 const init = async () => {
@@ -43,7 +43,7 @@ const init = async () => {
     const songsService = new SongsService();
     const authenticationsService = new AuthenticationsService();
     const usersService = new UsersService();
-    const collaborationsService = new CollabortionsService();
+    const collaborationsService = new CollaborationsService();
     const playlistsService = new PlaylistsService(collaborationsService);
     const playlistsSongsService = new PlaylistsSongsService();
     const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
@@ -126,7 +126,7 @@ const init = async () => {
         {
             plugin: collaborations,
             options: {
-                CollabortionsService: collaborationsService,
+                CollaborationsService: collaborationsService,
                 PlaylistsService: playlistsService,
                 CollaborationsValidator: CollaborationsValidator,
             },
@@ -138,7 +138,7 @@ const init = async () => {
         const { response } = request;
         console.log(response);
         if (response instanceof Error) {
-
+            
             // penanganan client error secara internal.
             if (response instanceof ClientError) {
                 const newResponse = h.response({
@@ -166,7 +166,6 @@ const init = async () => {
         // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
         return h.continue;
     });
-
 
     await server.start();
     console.log(`Server berjalan pada ${server.info.uri}`);
