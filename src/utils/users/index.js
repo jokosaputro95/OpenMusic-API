@@ -1,4 +1,4 @@
-const mapDBToModelUsers = ({
+const mapUsersToModel = ({
     id,
     username,
     password,
@@ -14,4 +14,4 @@ const mapDBToModelUsers = ({
     updatedAt: updated_at,
 });
 
-module.exports = {mapDBToModelUsers}
+module.exports = { mapUsersToModel }

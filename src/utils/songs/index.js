@@ -1,4 +1,4 @@
-const mapDBToModelSongs = ({
+const mapSongsToModel = ({
     id,
     title,
     year,
@@ -20,4 +20,4 @@ const mapDBToModelSongs = ({
     updatedAt: updated_at,
 });
 
-module.exports = { mapDBToModelSongs };
+module.exports = { mapSongsToModel };
