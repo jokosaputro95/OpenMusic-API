@@ -28,7 +28,8 @@ class PlaylistsSongsActivitiesService {
         const time = new Date().toISOString();
 
         const query = {
-            text: 'INSERT INTO playlist_song_activities VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
+            text: `INSERT INTO playlist_song_activities (id, playlist_id, song_id, song_title, user_id, username, action, time)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
             values: [activitiesId, playlistId, songId, songTitle, userId, username, 'add', time],
         };
 
@@ -55,8 +56,9 @@ class PlaylistsSongsActivitiesService {
         const time = new Date().toISOString();
 
         const query = {
-            text: 'INSERT INTO playlist_song_activities VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
-            values: [activitiesId, playlistId, songId, songTitle, userId, username, 'delete', time],
+            text: `INSERT INTO playlist_song_activities (id, playlist_id, song_id, song_title, user_id, username, action, time)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+            values: [activitiesId, playlistId, songId, songTitle, userId, username, 'add', time],
         };
 
         await this._pool.query(query);
