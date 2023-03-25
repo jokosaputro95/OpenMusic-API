@@ -32,25 +32,26 @@ class PlaylistsSongsService {
 
     async getSongsFromPlaylist(playlistId) {
         const playlistQuery = {
-            text: `SELECT playlists.id, playlists.name, users.username 
-                 FROM playlist_songs 
-                 INNER JOIN playlists ON playlist_songs.playlist_id = playlists.id 
-                 INNER JOIN users ON playlists.owner = users.id 
-                 WHERE playlist_id = $1`,
+            text: `SELECT B.id, B.name, C.username 
+            FROM playlist_songs A
+            INNER JOIN playlists B ON A.playlist_id = B.id 
+            INNER JOIN users C ON B.owner = C.id 
+            WHERE playlist_id = $1`,
             values: [playlistId],
         };
 
         const userQuery = {
-            text: `SELECT username FROM playlists 
-                 INNER JOIN users ON playlists.owner = users.id 
-                 WHERE playlists.id = $1`,
+            text: `SELECT username FROM playlists A
+            INNER JOIN users B ON A.owner = B.id
+            WHERE A.id = $1`,
             values: [playlistId],
         };
 
         const songQuery = {
-            text: `SELECT songs.id, songs.title, songs.performer FROM playlist_songs 
-                 INNER JOIN songs ON playlist_songs.song_id = songs.id 
-                 WHERE playlist_id = $1`,
+            text: `SELECT B.id, B.title, B.performer
+            FROM playlist_songs A
+            INNER JOIN songs B ON A.song_id = B.id
+            WHERE playlist_id = $1`,
             values: [playlistId],
         };
 

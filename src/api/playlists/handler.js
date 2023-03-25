@@ -5,8 +5,7 @@ class PlaylistsHandler {
         PlaylistsService,
         PlaylistsSongsService,
         PlaylistsSongsActivitiesService,
-        PlaylistsValidator,
-
+        PlaylistsValidator
     ) {
         this._playlistsService = PlaylistsService;
         this._playlistsSongsService = PlaylistsSongsService;
@@ -16,7 +15,7 @@ class PlaylistsHandler {
         autoBind(this);
     }
 
-    async postPlaylistsHandler(request, h) {
+    async postPlaylistHandler(request, h) {
         this._playlistsValidator.validatePlaylistsPayload(request.payload);
 
         const { name } = request.payload;
@@ -63,8 +62,8 @@ class PlaylistsHandler {
         return response;
     }
 
-    async postSongToPlaylistByIdHandler(request, h) {
-        this._playlistsValidator.validateSongInPlaylistPayload(request.payload);
+    async postSongToPlaylistHandler(request, h) {
+        this._playlistsValidator.validatePlaylistSongsPayload(request.payload);
 
         const { id: credentialId } = request.auth.credentials;
         const { id: playlistId } = request.params;
@@ -72,7 +71,6 @@ class PlaylistsHandler {
 
         await this._playlistsService.verifyPlaylistsAccess(playlistId, credentialId);
         await this._playlistsSongsService.addSongToPlaylist(playlistId, songId);
-
         await this._playlistsSongsActivitiesService.activitiesAddSongPlaylist(playlistId, songId, credentialId);
 
         const response = h.response({
@@ -99,14 +97,13 @@ class PlaylistsHandler {
         };
     }
 
-    async deleteSongsFromPlaylistByIdHandler(request) {
+    async deleteSongFromPlaylistByIdHandler(request) {
         const { id: credentialId } = request.auth.credentials;
         const { id: playlistId } = request.params;
         const { songId } = request.payload;
 
         await this._playlistsService.verifyPlaylistsAccess(playlistId, credentialId);
         await this._playlistsSongsService.deleteSongFromPlaylist(playlistId, songId);
-
         await this._playlistsSongsActivitiesService.activitiesDeleteSongPlaylist(playlistId, songId, credentialId);
 
         return {
@@ -115,7 +112,7 @@ class PlaylistsHandler {
         };
     }
 
-    async getPlaylistActivitiesByIdHandler(request) {
+    async getPlaylistActivitiesHandler(request) {
         const { id: credentialId } = request.auth.credentials;
         const { id: playlistId } = request.params;
 

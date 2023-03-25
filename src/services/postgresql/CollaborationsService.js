@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
-const { nandoid } = require('nanoid');
+const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class CollaborationsService {
     constructor() {
@@ -32,7 +33,7 @@ class CollaborationsService {
           throw new NotFoundError('User tidak ditemukan.');
         }
         
-        const id = `collab-${nandoid(16)}`;
+        const id = `collab-${nanoid(16)}`;
 
         const query = {
             text: 'INSERT INTO collaborations VALUES ($1, $2, $3) RETURNING id',

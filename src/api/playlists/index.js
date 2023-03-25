@@ -19,7 +19,7 @@ module.exports = {
             PlaylistsSongsActivitiesService,
             PlaylistsValidator
         );
-        
+
         server.route(routes(playlistHandler));
     },
 };

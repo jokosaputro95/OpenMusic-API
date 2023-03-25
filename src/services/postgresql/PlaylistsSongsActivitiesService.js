@@ -32,13 +32,7 @@ class PlaylistsSongsActivitiesService {
             values: [activitiesId, playlistId, songId, songTitle, userId, username, 'add', time],
         };
 
-        const result = await this._pool.query(query);
-
-        if (!result.rows[0].id) {
-            throw new InvarianError('Activity gagal ditambahkan ke playlist');
-        }
-
-        return result.rows[0].id;
+        await this._pool.query(query);
     }
     async activitiesDeleteSongPlaylist(playlistId, songId, userId) {
         const songQuery = {
@@ -65,23 +59,11 @@ class PlaylistsSongsActivitiesService {
             values: [activitiesId, playlistId, songId, songTitle, userId, username, 'delete', time],
         };
 
-        const result = await this._pool.query(query);
-
-        if (!result.rows[0].id) {
-            throw new InvarianError('Activity gagal ditambahkan ke playlist');
-        }
-
-        return result.rows[0].id;
+        await this._pool.query(query);
     }
 
     async getActivitiesSongPlaylist(playlistId) {
         const query = {
-            // text: `SELECT B.username, C.title, A.action, A.time FROM playlist_song_activities A
-            // LEFT JOIN users B ON B.id = A.user_id
-            // LEFT JOIN songs C ON C.id = A.song_id
-            // WHERE A.playlist_id = $1
-            // ORDER BY A.action`,
-            // values: [playlistId],
             text: 'SELECT * FROM playlist_song_activities WHERE playlist_id = $1',
             values: [playlistId],
         };
