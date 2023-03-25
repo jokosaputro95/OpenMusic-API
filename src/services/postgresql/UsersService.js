@@ -5,7 +5,7 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthenticationError = require('../../exceptions/AuthenticationError');
 
-class UserService {
+class UsersService {
     constructor() {
         this._pool = new Pool();
     }
@@ -18,7 +18,7 @@ class UserService {
 
         const result = await this._pool.query(query);
 
-        if (result.rowCount !== 0) {
+        if (result.rowCount > 0) {
             throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
         }
     }
@@ -93,4 +93,4 @@ class UserService {
     }
 }
 
-module.exports = UserService;
+module.exports = UsersService;
