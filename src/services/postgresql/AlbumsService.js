@@ -1,9 +1,8 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
-const { mapDBToModelAlbums } = require('../../utils/albums');
+const { mapAlbumsToModel } = require('../../utils/albums');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-
 
 class AlbumsService {
     constructor() {
@@ -15,7 +14,7 @@ class AlbumsService {
         const createdAt = new Date().toISOString();
 
         const query = {
-            text: 'INSERT INTO albums VALUES($1, $2, $3, $4, $4) RETURNING id',
+            text: 'INSERT INTO albums VALUES($1, $2, $3, $4) RETURNING id',
             values: [id, name, year, createdAt],
         };
 
@@ -28,8 +27,11 @@ class AlbumsService {
     }
 
     async getAlbums() {
-        const result = await this._pool.query('SELECT * FROM albums');
-        return result.rows.map(mapDBToModelAlbums);
+        const query = 'SELECT * FROM albums';
+
+        const result = await this._pool.query(query);
+
+        return result.rows.map(mapAlbumsToModel);
     }
 
     async getAlbumById(id) {
@@ -37,49 +39,19 @@ class AlbumsService {
             text: 'SELECT * FROM albums WHERE id = $1',
             values: [id],
         };
+
         const resultAlbum = await this._pool.query(queryAlbum);
 
         if (!resultAlbum.rowCount) {
             throw new NotFoundError('Album tidak ditemukan');
         }
 
-        return resultAlbum.rows.map(mapDBToModelAlbums)[0];
-
-        // const querySongInAlbum = {
-        //     text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
-        //     values: [id],
-        // }
-        // const resultSong = await this._pool.query(querySongInAlbum);
-
-        // const result = {
-        //     ...resultAlbum.rows[0],
-        //     songs: resultSong.rows
-        // }
-        // return result;
-
-        // return resultAlbum.rows.map(mapDBToModelAlbum)[0];
-        // const querySong = {
-        //     text: 'SELECT songs.id, songs.title, songs.performer FROM songs INNER JOIN albums ON albums.id=songs."albumId" WHERE albums.id=$1',
-        //     values: [id],
-        // }
-
-
-        // const resultSong = await this._pool.query(querySong);
-
-
-        // return {
-        //     id: resultAlbum.rows[0].id,
-        //     name: resultAlbum.rows[0].name,
-        //     year: resultAlbum.rows[0].year,
-        //     songs: resultSong.rows,
-
-        // };
-
+        return resultAlbum.rows.map(mapAlbumsToModel)[0];
     }
 
     async editAlbumById(id, { name, year }) {
         const updatedAt = new Date().toISOString();
-        
+
         const query = {
             text: 'UPDATE albums SET name = $1, year = $2, updated_at = $3 WHERE id = $4 RETURNING id',
             values: [name, year, updatedAt, id],
