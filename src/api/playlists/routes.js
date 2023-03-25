@@ -2,7 +2,7 @@ const routes = (handler) => [
     {
         method: 'POST',
         path: '/playlists',
-        handler: handler.postPlaylistHandler,
+        handler: (request, h) => handler.postPlaylistHandler(request, h),
         options: {
             auth: 'openmusic_jwt',
         }
@@ -10,7 +10,7 @@ const routes = (handler) => [
     {
         method: 'GET',
         path: '/playlists',
-        handler: handler.getPlaylistsHandler,
+        handler: (request) => handler.getPlaylistsHandler(request),
         options: {
             auth: 'openmusic_jwt',
         }
@@ -18,7 +18,7 @@ const routes = (handler) => [
     {
         method: 'DELETE',
         path: '/playlists/{id}',
-        handler: handler.deletePlaylistByIdHandler,
+        handler: (request, h) => handler.deletePlaylistByIdHandler(request, h),
         options: {
             auth: 'openmusic_jwt',
         },
@@ -26,7 +26,7 @@ const routes = (handler) => [
     {
         method: 'POST',
         path: '/playlists/{id}/songs',
-        handler: handler.postSongToPlaylistHandler,
+        handler: (request, h) => handler.postSongToPlaylistHandler(request, h),
         options: {
             auth: 'openmusic_jwt',
         },
@@ -34,7 +34,7 @@ const routes = (handler) => [
     {
         method: 'GET',
         path: '/playlists/{id}/songs',
-        handler: handler.getSongsFromPlaylistByIdHandler,
+        handler: (request) => handler.getSongsFromPlaylistByIdHandler(request),
         options: {
             auth: 'openmusic_jwt',
         },
@@ -42,7 +42,7 @@ const routes = (handler) => [
     {
         method: 'DELETE',
         path: '/playlists/{id}/songs',
-        handler: handler.deleteSongFromPlaylistByIdHandler,
+        handler: (request) => handler.deleteSongFromPlaylistByIdHandler(request),
         options: {
             auth: 'openmusic_jwt',
         },
@@ -50,7 +50,7 @@ const routes = (handler) => [
     {
         method: 'GET',
         path: '/playlists/{id}/activities',
-        handler: handler.getPlaylistActivitiesHandler,
+        handler: (request) => handler.getPlaylistActivitiesHandler(request),
         options: {
             auth: 'openmusic_jwt',
         }
