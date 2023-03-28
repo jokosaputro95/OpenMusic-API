@@ -19,10 +19,20 @@ class SongsService {
     }) {
         const id = `song-${nanoid(16)}`;
         const createdAt = new Date().toISOString();
-        const updatedAt = createdAt;
+        // const updatedAt = createdAt; // implementasi reviewer
 
         const query = {
-            text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id',
+            text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8) RETURNING id',
+            // values: [id,
+            //     title,
+            //     year,
+            //     performer,
+            //     genre,
+            //     duration,
+            //     albumId,
+            //     createdAt,
+            //     updatedAt,
+            // ],
             values: [id,
                 title,
                 year,
@@ -31,7 +41,6 @@ class SongsService {
                 duration,
                 albumId,
                 createdAt,
-                updatedAt,
             ],
         };
 
@@ -49,9 +58,14 @@ class SongsService {
             values: [`%${title}%`, `%${performer}%`],
         };
 
-        const result = await this._pool.query(query);
+        // const result = await this._pool.query(query);
 
-        return result.rows.map(mapSongsToModel);
+        // return result.rows.map(mapSongsToModel);
+
+        // implemente code reviewer
+        const { rows } = await this._pool.query(query);
+
+        return rows;
     }
 
     async getSongById(id) {
