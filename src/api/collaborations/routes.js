@@ -2,7 +2,7 @@ const routes = (handler) => [
     {
         method: 'POST',
         path: '/collaborations',
-        handler: (request) => handler.postCollaborationHandler(request, h),
+        handler: (request, h) => handler.postCollaborationHandler(request, h),
         options: {
             auth: 'openmusic_jwt',
         },

@@ -97,7 +97,7 @@ class PlaylistsHandler {
         };
     }
 
-    async deleteSongFromPlaylistByIdHandler(request) {
+    async deleteSongFromPlaylistByIdHandler(request, h) {
         const { id: credentialId } = request.auth.credentials;
         const { id: playlistId } = request.params;
         const { songId } = request.payload;
@@ -106,10 +106,10 @@ class PlaylistsHandler {
         await this._playlistsSongsService.deleteSongFromPlaylist(playlistId, songId);
         await this._playlistsSongsActivitiesService.activitiesDeleteSongPlaylist(playlistId, songId, credentialId);
 
-        return {
+        return h.response({
             status: 'success',
             message: 'Lagu berhasil dihapus dari playlist',
-        };
+        });
     }
 
     async getPlaylistActivitiesHandler(request) {

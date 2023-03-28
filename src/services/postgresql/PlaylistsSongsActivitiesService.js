@@ -35,6 +35,7 @@ class PlaylistsSongsActivitiesService {
 
         await this._pool.query(query);
     }
+
     async activitiesDeleteSongPlaylist(playlistId, songId, userId) {
         const songQuery = {
             text: 'SELECT title FROM songs WHERE id = $1',
@@ -58,12 +59,12 @@ class PlaylistsSongsActivitiesService {
         const query = {
             text: `INSERT INTO playlist_song_activities (id, playlist_id, song_id, song_title, user_id, username, action, time)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-            values: [activitiesId, playlistId, songId, songTitle, userId, username, 'add', time],
+            values: [activitiesId, playlistId, songId, songTitle, userId, username, 'delete', time],
         };
 
         await this._pool.query(query);
     }
-
+    
     async getActivitiesSongPlaylist(playlistId) {
         const query = {
             text: 'SELECT * FROM playlist_song_activities WHERE playlist_id = $1',
