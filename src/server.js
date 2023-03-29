@@ -2,6 +2,9 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
+const path = require('path');
+const config = require('./utils/config/config');
 const ClientError = require('./exceptions/ClientError');
 
 // Albums
@@ -37,9 +40,21 @@ const collaborations = require('./api/collaborations');
 const CollaborationsValidator = require('./validator/collaborations');
 const CollaborationsService = require('./services/postgresql/CollaborationsService');
 
+// Exports
+const _exports = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
+// Uploads
+const StorageService = require('./services/storage/StorageService');
+const UploadsValidator = require('./validator/uploads');
+
+// Cache
+const CacheService = require('./services/redis/CacheService');
 
 const init = async () => {
-    const albumsService = new AlbumsService();
+    const cacheService = new CacheService();
+    const albumsService = new AlbumsService(cacheService);
     const songsService = new SongsService();
     const authenticationsService = new AuthenticationsService();
     const usersService = new UsersService();
@@ -47,10 +62,11 @@ const init = async () => {
     const playlistsService = new PlaylistsService(collaborationsService);
     const playlistsSongsService = new PlaylistsSongsService();
     const playlistsSongsActivitiesService = new PlaylistsSongsActivitiesService();
+    const storageService = new StorageService(path.resolve(__dirname, 'api/albums/file/covers'));
 
     const server = Hapi.server({
-        port: process.env.PORT,
-        host: process.env.HOST,
+        host: config.app.host,
+        port: config.app.port,
         routes: {
             cors: {
                 origin: ['*'],
@@ -62,6 +78,9 @@ const init = async () => {
     await server.register([
         {
             plugin: Jwt,
+        },
+        {
+            plugin: Inert,
         },
     ]);
 
@@ -89,6 +108,8 @@ const init = async () => {
                 AlbumsService: albumsService,
                 SongsService: songsService,
                 AlbumsValidator: albumsValidator,
+                StorageService: storageService,
+                UploadsValidator,
             },
         },
         {
@@ -128,7 +149,15 @@ const init = async () => {
             options: {
                 CollaborationsService: collaborationsService,
                 PlaylistsService: playlistsService,
-                CollaborationsValidator: CollaborationsValidator,
+                CollaborationsValidator,
+            },
+        },
+        {
+            plugin: _exports,
+            options: {
+                ProducerService,
+                PlaylistsService: playlistsService,
+                ExportsValidator,
             },
         },
     ]);
@@ -136,9 +165,8 @@ const init = async () => {
     server.ext('onPreResponse', (request, h) => {
         // mendapatkan konteks response dari request
         const { response } = request;
-        console.log(response);
+        // console.log(response);
         if (response instanceof Error) {
-            
             // penanganan client error secara internal.
             if (response instanceof ClientError) {
                 const newResponse = h.response({
