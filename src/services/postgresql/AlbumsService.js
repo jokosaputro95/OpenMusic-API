@@ -125,39 +125,7 @@ class AlbumsService {
             await this._pool.query(queryAddLike);
             await this._cacheService.delete(`user_album_likes:${albumId}`);
         }
-
-        // if (resultCheckLike) {
-        //     throw new ClientError('Tidak dapat menambahkan like');
-        // }
-
-        // if (resultCheckLike.rowCount) {
-        //     const queryDeleteLike = {
-        //         text: 'DELETE FROM user_album_likes WHERE id = $1 RETURNING id',
-        //         values: [resultCheckLike.rows[0].id],
-        //     };
-        //     await this._pool.query(queryDeleteLike);
-        //     await this._cacheService.delete(`user_album_likes:${albumId}`);
-        // } if (!resultCheckLike.rowCount || resultCheckLike.rows[0].id) {
-        //     const id = `album-like-${nanoid(16)}`;
-        //     const queryAddLike = {
-        //         text: 'INSERT INTO user_album_likes VALUES($1, $2, $3) RETURNING id',
-        //         values: [id, userId, albumId],
-        //     };
-
-        //     await this._pool.query(queryAddLike);
-        //     await this._cacheService.delete(`user_album_likes:${albumId}`);
-        // } else {
-        //     // const { id } = await this._cacheService.get(`user_album_likes:${albumId}`);
-        //     // const queryDeleteLike = {
-        //     //     text: 'DELETE FROM user_album_likes WHERE id = $1 RETURNING id',
-        //     //     values: [id],
-        //     // };
-
-        //     // await this._pool.query(queryDeleteLike);
-        //     // await this._cacheService.delete(`user_album_likes:${albumId}`);
-        //     await this._cacheService.delete(`user_album_likes:${albumId}`);
-        //     // throw new ClientError('Album tidak dapat di like');
-        // }
+        await this._cacheService.delete(`user_album_likes:${albumId}`);
         return like;
     }
 
