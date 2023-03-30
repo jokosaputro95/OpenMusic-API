@@ -1,18 +1,22 @@
 /* eslint-disable camelcase */
 
 exports.up = (pgm) => {
-    pgm.createTable('playlists', {
+    pgm.createTable('user_album_likes', {
         id: {
             type: 'VARCHAR(50)',
             primaryKey: true,
         },
-        name: {
-            type: 'TEXT',
-            notNull: true,
-        },
-        owner: {
+        user_id: {
             type: 'VARCHAR(50)',
             notNull: true,
+            references: 'users',
+            onDelete: 'cascade',
+        },
+        album_id: {
+            type: 'VARCHAR(50)',
+            notNull: true,
+            references: 'albums',
+            onDelete: 'cascade',
         },
         created_at: {
             type: 'TIMESTAMP',
@@ -25,15 +29,8 @@ exports.up = (pgm) => {
             default: pgm.func('CURRENT_TIMESTAMP'),
         },
     });
-
-    pgm.addConstraint(
-        'playlists',
-        'fk_playlists.owner',
-        'FOREIGN KEY(owner) REFERENCES users(id) ON DELETE CASCADE',
-    );
 };
 
 exports.down = (pgm) => {
-    pgm.dropConstraint('playlists', 'fk_playlists.owner');
-    pgm.dropTable('playlists');
+    pgm.dropTable('user_album_likes');
 };

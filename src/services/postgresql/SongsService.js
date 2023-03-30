@@ -94,7 +94,14 @@ class SongsService {
         return result.rows.map(mapSongsToModel);
     }
 
-    async editSongById(id, { title, year, performer, genre, duration = null, albumId = null }) {
+    async editSongById(id, {
+        title,
+        year,
+        performer,
+        genre,
+        duration = null,
+        albumId = null,
+    }) {
         const updatedAt = new Date().toISOString();
 
         const query = {
@@ -116,7 +123,7 @@ class SongsService {
         };
 
         const result = await this._pool.query(query);
-        
+
         if (!result.rowCount) {
             throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
         }

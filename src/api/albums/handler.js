@@ -57,7 +57,7 @@ class AlbumsHandler {
             data: {
                 album,
             },
-        }
+        };
     }
 
     async putAlbumByIdHandler(request, h) {
@@ -108,17 +108,17 @@ class AlbumsHandler {
     }
 
     async postLikesAlbumHandler(request, h) {
-        const { id: credentialId } = request.auth.credentials;
         const { id } = request.params;
+        const { id: credentialId } = request.auth.credentials;
 
-        const message = await this._albumsService.likeAlbum(id, credentialId);
+        await this._albumsService.checkAlbum(id);
 
-        const response = h.response({
+        const like = await this._albumsService.addLikeAndDislikeAlbum(id, credentialId);
+
+        return h.response({
             status: 'success',
-            message,
-        });
-        response.code(201);
-        return response;
+            message: `Berhasil ${like} Album`,
+        }).code(201);
     }
 
     async getLikesAlbumByIdhandler(request, h) {
@@ -134,6 +134,20 @@ class AlbumsHandler {
 
         response.header('X-Data-Source', source);
         return response;
+    }
+
+    async deleteLikesAlbumByIdhandler(request, h) {
+        const { id } = request.params;
+        const { id: credentialId } = request.auth.credentials;
+
+        await this._albumsService.checkAlbum(id);
+
+        await this._albumsService.unLikeAlbumById(id, credentialId);
+
+        return h.response({
+            status: 'success',
+            message: 'Album batal disukai',
+        }).code(200);
     }
 }
 

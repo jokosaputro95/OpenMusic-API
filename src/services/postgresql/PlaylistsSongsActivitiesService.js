@@ -64,7 +64,7 @@ class PlaylistsSongsActivitiesService {
 
         await this._pool.query(query);
     }
-    
+
     async getActivitiesSongPlaylist(playlistId) {
         const query = {
             text: 'SELECT * FROM playlist_song_activities WHERE playlist_id = $1',
@@ -74,7 +74,7 @@ class PlaylistsSongsActivitiesService {
         const result = await this._pool.query(query);
 
         if (!result.rowCount) {
-            throw new NotFoundError('Tidak ada aktivitas playlist')
+            throw new NotFoundError('Tidak ada aktivitas playlist');
         }
 
         const resultMap = result.rows.map((data) => ({
@@ -85,7 +85,7 @@ class PlaylistsSongsActivitiesService {
         }));
 
         return {
-            playlistId: playlistId,
+            playlistId,
             activities: resultMap,
         };
     }

@@ -30,9 +30,9 @@ class CollaborationsService {
         const userResult = await this._pool.query(userQuery);
 
         if (!userResult.rowCount) {
-          throw new NotFoundError('User tidak ditemukan.');
+            throw new NotFoundError('User tidak ditemukan.');
         }
-        
+
         const id = `collab-${nanoid(16)}`;
 
         const query = {

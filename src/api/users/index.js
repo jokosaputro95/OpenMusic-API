@@ -8,4 +8,4 @@ module.exports = {
         const usersHandler = new UsersHandler(UsersService, UsersValidator);
         server.route(routes(usersHandler));
     },
-  };
+};

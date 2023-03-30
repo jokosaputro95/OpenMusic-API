@@ -8,9 +8,9 @@ module.exports = {
         const exportsHandler = new ExportsHandler(
             ProducerService,
             PlaylistsService,
-            ExportsValidator
+            ExportsValidator,
         );
-        
+
         server.route(routes(exportsHandler));
     },
 };

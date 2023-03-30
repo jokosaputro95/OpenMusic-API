@@ -1,4 +1,5 @@
 const autoBind = require('auto-bind');
+
 class SongsHandler {
     constructor(SongsService, SongsValidator) {
         this._songsService = SongsService;

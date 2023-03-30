@@ -13,6 +13,11 @@
     "rules": {
         "no-console": "off",
         "indent": ["error", 4],
-        "no-underscore-dangle": ["error", {"allow": ["_exports"] }]
+        "no-underscore-dangle": ["error", {
+            "allow": ["_exports"],
+            "allowAfterThis": true,
+            "allowAfterSuper": true
+            }],
+        "camelcase": "off"
     }
 }

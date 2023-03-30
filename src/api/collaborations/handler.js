@@ -17,7 +17,10 @@ class CollaborationsHandler {
 
         await this._playlistsService.verifyPlaylistsOwner(playlistId, credentialId);
 
-        const collaborationId = await this._collaborationsService.addCollaborator(playlistId, userId);
+        const collaborationId = await this._collaborationsService.addCollaborator(
+            playlistId,
+            userId,
+        );
 
         const response = h.response({
             status: 'success',

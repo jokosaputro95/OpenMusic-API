@@ -5,7 +5,7 @@ class PlaylistsHandler {
         PlaylistsService,
         PlaylistsSongsService,
         PlaylistsSongsActivitiesService,
-        PlaylistsValidator
+        PlaylistsValidator,
     ) {
         this._playlistsService = PlaylistsService;
         this._playlistsSongsService = PlaylistsSongsService;
@@ -71,7 +71,11 @@ class PlaylistsHandler {
 
         await this._playlistsService.verifyPlaylistsAccess(playlistId, credentialId);
         await this._playlistsSongsService.addSongToPlaylist(playlistId, songId);
-        await this._playlistsSongsActivitiesService.activitiesAddSongPlaylist(playlistId, songId, credentialId);
+        await this._playlistsSongsActivitiesService.activitiesAddSongPlaylist(
+            playlistId,
+            songId,
+            credentialId,
+        );
 
         const response = h.response({
             status: 'success',
@@ -104,7 +108,11 @@ class PlaylistsHandler {
 
         await this._playlistsService.verifyPlaylistsAccess(playlistId, credentialId);
         await this._playlistsSongsService.deleteSongFromPlaylist(playlistId, songId);
-        await this._playlistsSongsActivitiesService.activitiesDeleteSongPlaylist(playlistId, songId, credentialId);
+        await this._playlistsSongsActivitiesService.activitiesDeleteSongPlaylist(
+            playlistId,
+            songId,
+            credentialId,
+        );
 
         return h.response({
             status: 'success',
@@ -118,7 +126,9 @@ class PlaylistsHandler {
 
         await this._playlistsService.verifyPlaylistsAccess(playlistId, credentialId);
 
-        const activities = await this._playlistsSongsActivitiesService.getActivitiesSongPlaylist(playlistId);
+        const activities = await this._playlistsSongsActivitiesService.getActivitiesSongPlaylist(
+            playlistId,
+        );
 
         return {
             status: 'success',

@@ -24,7 +24,7 @@ class ExportsHandler {
 
         await this._producerService.sendMessage(
             'export:playlist',
-            JSON.stringify(message)
+            JSON.stringify(message),
         );
 
         const response = h.response({
